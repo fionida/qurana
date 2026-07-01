@@ -30,10 +30,10 @@ jobs:
       - name: Deploy app core to public_html/qurana
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
+          server: ftp.myqurana.org
+          username: myqz6827
           password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT }}
+          port: 21
           protocol: ftps
           local-dir: ./
           server-dir: /public_html/qurana/
@@ -55,10 +55,10 @@ jobs:
       - name: Deploy public assets to public_html
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
+          server: ftp.myqurana.org
+          username: myqz6827
           password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT }}
+          port: 21
           protocol: ftps
           local-dir: ./public/
           server-dir: /public_html/

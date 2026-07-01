@@ -1,0 +1,255 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    [x-cloak] { display: none !important; }
+}
+
+@layer components {
+    .admin-input {
+        @apply w-full rounded-lg border-slate-200 bg-white text-sm text-slate-800 shadow-sm transition focus:border-emerald-500 focus:ring-emerald-500;
+    }
+
+    .admin-select {
+        @apply admin-input;
+    }
+
+    .admin-label {
+        @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500;
+    }
+
+    .admin-btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+    }
+
+    .admin-btn-primary {
+        @apply admin-btn bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500;
+    }
+
+    .admin-btn-secondary {
+        @apply admin-btn border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 focus:ring-slate-400;
+    }
+
+    .admin-btn-danger {
+        @apply admin-btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+    }
+
+    .admin-btn-ghost {
+        @apply admin-btn text-slate-600 hover:bg-slate-100 focus:ring-slate-400;
+    }
+
+    .admin-card {
+        @apply overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm;
+    }
+
+    .admin-card-header {
+        @apply flex items-center justify-between border-b border-slate-100 px-6 py-4;
+    }
+
+    .admin-card-body {
+        @apply p-6;
+    }
+
+    .admin-table-wrap {
+        @apply overflow-x-auto;
+    }
+
+    .admin-table {
+        @apply w-full text-sm;
+    }
+
+    .admin-table thead {
+        @apply bg-slate-50/80;
+    }
+
+    .admin-table th {
+        @apply px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500;
+    }
+
+    .admin-table td {
+        @apply px-5 py-4 text-slate-700;
+    }
+
+    .admin-table tbody tr {
+        @apply border-t border-slate-100 transition hover:bg-slate-50/70;
+    }
+
+    .admin-badge {
+        @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold;
+    }
+
+    .admin-badge-success {
+        @apply admin-badge bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/10;
+    }
+
+    .admin-badge-warning {
+        @apply admin-badge bg-amber-50 text-amber-700 ring-1 ring-amber-600/10;
+    }
+
+    .admin-badge-neutral {
+        @apply admin-badge bg-slate-100 text-slate-600 ring-1 ring-slate-500/10;
+    }
+
+    .admin-nav-item {
+        @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition;
+    }
+
+    .admin-nav-item-active {
+        @apply bg-emerald-800 text-white shadow-sm;
+    }
+
+    .admin-nav-item-inactive {
+        @apply text-emerald-100 hover:bg-emerald-800 hover:text-white;
+    }
+
+    .admin-stat-card {
+        @apply admin-card p-5;
+    }
+
+    .admin-page {
+        @apply flex min-h-0 w-full flex-1 flex-col gap-4;
+    }
+
+    .admin-page-header {
+        @apply shrink-0;
+    }
+
+    .admin-page-toolbar {
+        @apply shrink-0;
+    }
+
+    .admin-page-body {
+        @apply flex min-h-0 flex-1 flex-col overflow-hidden;
+    }
+
+    .admin-page-body .admin-card {
+        @apply flex min-h-0 flex-1 flex-col;
+    }
+
+    .admin-page-body .admin-table-wrap {
+        @apply min-h-0 flex-1 overflow-y-auto;
+    }
+
+    .admin-page-body--scroll {
+        @apply gap-4 overflow-y-auto;
+    }
+
+    .admin-page-body--scroll > .admin-card,
+    .admin-page-body--scroll > .grid {
+        @apply shrink-0 flex-none;
+    }
+
+    .admin-page-body--scroll .admin-card-grow {
+        @apply flex min-h-0 flex-1 flex-col;
+    }
+
+    .admin-page-body--scroll .admin-card-grow .admin-table-wrap {
+        @apply min-h-0 flex-1 overflow-y-auto;
+    }
+
+    .admin-workspace {
+        @apply flex min-h-0 flex-1 flex-col overflow-hidden;
+    }
+
+    .public-input {
+        @apply admin-input;
+    }
+
+    .public-select {
+        @apply admin-select;
+    }
+
+    .public-label {
+        @apply admin-label !normal-case !tracking-normal text-slate-600;
+    }
+
+    .public-card {
+        @apply admin-card;
+    }
+
+    .public-btn-primary {
+        @apply admin-btn-primary;
+    }
+
+    .public-btn-secondary {
+        @apply admin-btn-secondary;
+    }
+
+    /* Flatpickr — inspired by modern date picker UI */
+    .flatpickr-calendar {
+        @apply rounded-2xl border border-slate-200 bg-white shadow-xl;
+        padding: 12px;
+        width: 320px;
+    }
+
+    .flatpickr-months {
+        @apply mb-2;
+    }
+
+    .flatpickr-months .flatpickr-month {
+        @apply h-10;
+    }
+
+    .flatpickr-current-month {
+        @apply text-sm font-semibold text-slate-800;
+        padding-top: 0;
+    }
+
+    .flatpickr-current-month .flatpickr-monthDropdown-months,
+    .flatpickr-current-month input.cur-year {
+        @apply font-semibold text-slate-800;
+    }
+
+    .flatpickr-weekdays {
+        @apply mb-1;
+    }
+
+    span.flatpickr-weekday {
+        @apply text-xs font-semibold uppercase text-slate-400;
+    }
+
+    .flatpickr-day {
+        @apply rounded-xl text-sm font-medium text-slate-700;
+        max-width: 38px;
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .flatpickr-day.today {
+        @apply border border-emerald-300 bg-emerald-50 text-emerald-700;
+    }
+
+    .flatpickr-day.selected,
+    .flatpickr-day.selected:hover {
+        @apply border-emerald-600 bg-emerald-600 text-white;
+    }
+
+    .flatpickr-day:hover {
+        @apply bg-emerald-50 text-emerald-700;
+    }
+
+    .flatpickr-day.flatpickr-disabled {
+        @apply text-slate-300;
+    }
+
+    .flatpickr-months .flatpickr-prev-month,
+    .flatpickr-months .flatpickr-next-month {
+        @apply rounded-lg p-1 text-slate-500 hover:bg-slate-100 hover:text-emerald-600;
+        top: 8px;
+    }
+
+    .datepicker-field.flatpickr-wrap {
+        @apply relative block;
+    }
+
+    .datepicker-field .flatpickr-input[readonly],
+    .datepicker-field input[data-input] {
+        @apply public-input w-full cursor-pointer !pr-10;
+        background-color: white;
+    }
+
+    .datepicker-field .flatpickr-alt-input {
+        @apply public-input w-full cursor-pointer !pr-10;
+    }
+}

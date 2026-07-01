@@ -4,19 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Santri;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request): View
+    public function index(): View
     {
-        $query = Santri::query();
-
-        $this->applyFilters($query, $request);
-
-        $santris = (clone $query)->latest()->paginate(10)->withQueryString();
-
         $stats = [
             'total' => Santri::count(),
             'pending' => Santri::where('status_pembayaran', 'pending')->count(),
@@ -25,57 +18,39 @@ class DashboardController extends Controller
             'bayar_ditempat' => Santri::where('metode_pembayaran', 'bayar_ditempat')->count(),
         ];
 
+        $genderStats = [
+            'L' => Santri::where('jenis_kelamin', 'L')->count(),
+            'P' => Santri::where('jenis_kelamin', 'P')->count(),
+        ];
+        $genderStats['total'] = $genderStats['L'] + $genderStats['P'];
+
         $lembagaStats = Santri::query()
-            ->selectRaw('lembaga, count(*) as total')
+            ->selectRaw("COALESCE(lembaga, '') as lembaga, count(*) as total")
             ->groupBy('lembaga')
             ->orderByDesc('total')
-            ->get();
+            ->get()
+            ->map(function ($item) {
+                $name = trim((string) $item->lembaga);
+
+                return (object) [
+                    'lembaga' => $name !== '' ? $name : 'Belum diisi',
+                    'total' => (int) $item->total,
+                ];
+            })
+            ->groupBy('lembaga')
+            ->map(function ($rows, $name) {
+                return (object) [
+                    'lembaga' => $name,
+                    'total' => $rows->sum('total'),
+                ];
+            })
+            ->sortByDesc('total')
+            ->values();
 
         return view('admin.dashboard', [
-            'santris' => $santris,
             'stats' => $stats,
+            'genderStats' => $genderStats,
             'lembagaStats' => $lembagaStats,
-            'filters' => $request->only([
-                'nama_lengkap',
-                'lembaga',
-                'jenis_kelamin',
-                'metode_pembayaran',
-                'status_pembayaran',
-                'tanggal_dari',
-                'tanggal_sampai',
-            ]),
-            'lembagaOptions' => Santri::lembagaOptions(),
         ]);
-    }
-
-    protected function applyFilters($query, Request $request): void
-    {
-        if ($request->filled('nama_lengkap')) {
-            $query->where('nama_lengkap', 'like', '%'.$request->nama_lengkap.'%');
-        }
-
-        if ($request->filled('lembaga')) {
-            $query->where('lembaga', $request->lembaga);
-        }
-
-        if ($request->filled('jenis_kelamin')) {
-            $query->where('jenis_kelamin', $request->jenis_kelamin);
-        }
-
-        if ($request->filled('metode_pembayaran')) {
-            $query->where('metode_pembayaran', $request->metode_pembayaran);
-        }
-
-        if ($request->filled('status_pembayaran')) {
-            $query->where('status_pembayaran', $request->status_pembayaran);
-        }
-
-        if ($request->filled('tanggal_dari')) {
-            $query->whereDate('created_at', '>=', $request->tanggal_dari);
-        }
-
-        if ($request->filled('tanggal_sampai')) {
-            $query->whereDate('created_at', '<=', $request->tanggal_sampai);
-        }
     }
 }

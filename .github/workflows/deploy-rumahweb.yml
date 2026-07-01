@@ -34,7 +34,7 @@ jobs:
           username: myqz6827
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
-          protocol: ftps
+          protocol: ftp
           local-dir: ./
           server-dir: /public_html/qurana/
           exclude: |
@@ -59,7 +59,7 @@ jobs:
           username: myqz6827
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
-          protocol: ftps
+          protocol: ftp
           local-dir: ./public/
           server-dir: /public_html/
           exclude: |

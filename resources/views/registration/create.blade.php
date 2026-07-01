@@ -9,12 +9,13 @@
 @section('content')
 @php
     $loggedInUsername = auth()->user()?->username ?? auth()->user()?->name ?? auth()->user()?->email;
+    $displayLogo = $siteLogo ?? \App\Models\Setting::logoUrl();
 @endphp
 <div class="public-card">
     <div class="border-b border-slate-100 bg-gradient-to-r from-emerald-700 to-emerald-600 px-6 py-8 text-center text-white">
         <div class="mb-4 flex justify-center">
-            @if ($siteLogo ?? null)
-                <img src="{{ $siteLogo }}" alt="Logo Qurana" class="h-20 w-auto max-w-[200px] object-contain drop-shadow-md">
+            @if ($displayLogo)
+                <img src="{{ $displayLogo }}" alt="Logo Qurana" class="h-20 w-auto max-w-[200px] object-contain drop-shadow-md">
             @else
                 <div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 text-4xl font-extrabold backdrop-blur-sm">Q</div>
             @endif

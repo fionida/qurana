@@ -8,10 +8,10 @@
 
     <div class="admin-page-body admin-page-body--scroll">
         <div class="grid shrink-0 grid-cols-2 gap-4 lg:grid-cols-5">
-            <x-admin.stat-card label="Total Santri" :value="$stats['total']" color="slate">
+            <x-admin.stat-card label="Total Pendaftar" :value="$stats['total']" color="slate">
                 <x-slot:icon><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" /></svg></x-slot:icon>
             </x-admin.stat-card>
-            <x-admin.stat-card label="Pending" :value="$stats['pending']" color="amber">
+            <x-admin.stat-card label="Belum Lunas" :value="$stats['pending']" color="amber">
                 <x-slot:icon><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg></x-slot:icon>
             </x-admin.stat-card>
             <x-admin.stat-card label="Lunas" :value="$stats['lunas']" color="emerald">
@@ -25,81 +25,76 @@
             </x-admin.stat-card>
         </div>
 
-        @if ($lembagaStats->isNotEmpty())
         <div class="admin-card mt-4 shrink-0">
             <div class="admin-card-header">
                 <h3 class="font-semibold text-slate-900">Rekap per Lembaga</h3>
             </div>
             <div class="admin-card-body pt-0">
-                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    @foreach ($lembagaStats as $item)
-                        <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-3">
-                            <span class="text-sm font-medium text-slate-700">{{ $item->lembaga }}</span>
-                            <span class="rounded-lg bg-white px-2.5 py-1 text-sm font-bold text-emerald-600 shadow-sm">{{ $item->total }}</span>
+                @if ($lembagaStats->isNotEmpty())
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        @foreach ($lembagaStats as $item)
+                            <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/50 px-4 py-3">
+                                <span class="text-sm font-medium text-slate-700">{{ $item->lembaga }}</span>
+                                <span class="rounded-lg bg-white px-2.5 py-1 text-sm font-bold text-emerald-600 shadow-sm">{{ $item->total }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="py-3 text-sm text-slate-400">Belum ada data lembaga.</p>
+                @endif
+            </div>
+        </div>
+
+        @php
+            $genderTotal = max(1, $genderStats['total']);
+            $maleDeg = ($genderStats['L'] / $genderTotal) * 360;
+
+            $paymentTotal = max(1, $stats['transfer'] + $stats['bayar_ditempat']);
+            $transferDeg = ($stats['transfer'] / $paymentTotal) * 360;
+        @endphp
+
+        <div class="mt-4 grid shrink-0 grid-cols-1 gap-4 lg:grid-cols-2">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h3 class="font-semibold text-slate-900">Diagram Jenis Kelamin</h3>
+                </div>
+                <div class="admin-card-body flex flex-col items-center gap-5 pt-0 sm:flex-row sm:items-start sm:justify-between">
+                    <div class="rounded-full border border-slate-100 shadow-inner"
+                        style="width:11rem; height:11rem; min-width:11rem; min-height:11rem; background: conic-gradient(#0ea5e9 0deg {{ $maleDeg }}deg, #f472b6 {{ $maleDeg }}deg 360deg);"></div>
+                    <div class="w-full space-y-2 sm:max-w-[220px]">
+                        <div class="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm">
+                            <span class="inline-flex items-center gap-2 text-slate-700"><span class="h-2.5 w-2.5 rounded-full bg-sky-500"></span>Laki-laki</span>
+                            <span class="font-semibold text-slate-900">{{ $genderStats['L'] }}</span>
                         </div>
-                    @endforeach
+                        <div class="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm">
+                            <span class="inline-flex items-center gap-2 text-slate-700"><span class="h-2.5 w-2.5 rounded-full bg-pink-400"></span>Perempuan</span>
+                            <span class="font-semibold text-slate-900">{{ $genderStats['P'] }}</span>
+                        </div>
+                        <div class="pt-1 text-xs text-slate-500">Total: {{ $genderStats['total'] }} pendaftar</div>
+                    </div>
                 </div>
             </div>
-        </div>
-        @endif
 
-        <div class="admin-card mt-4 shrink-0">
-            <div class="admin-card-header">
-                <h3 class="font-semibold text-slate-900">Filter Data</h3>
-            </div>
-            <div class="admin-card-body">
-                <form method="GET" class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                    <div><label class="admin-label">Nama</label><input type="text" name="nama_lengkap" value="{{ $filters['nama_lengkap'] ?? '' }}" class="admin-input"></div>
-                    <div><label class="admin-label">Lembaga</label><select name="lembaga" class="admin-select"><option value="">Semua</option>@foreach ($lembagaOptions as $lembaga)<option value="{{ $lembaga }}" @selected(($filters['lembaga'] ?? '') === $lembaga)>{{ $lembaga }}</option>@endforeach</select></div>
-                    <div><label class="admin-label">Jenis Kelamin</label><select name="jenis_kelamin" class="admin-select"><option value="">Semua</option><option value="L" @selected(($filters['jenis_kelamin'] ?? '') === 'L')>Laki-laki</option><option value="P" @selected(($filters['jenis_kelamin'] ?? '') === 'P')>Perempuan</option></select></div>
-                    <div><label class="admin-label">Metode Bayar</label><select name="metode_pembayaran" class="admin-select"><option value="">Semua</option><option value="transfer" @selected(($filters['metode_pembayaran'] ?? '') === 'transfer')>Transfer</option><option value="bayar_ditempat" @selected(($filters['metode_pembayaran'] ?? '') === 'bayar_ditempat')>Bayar di Tempat</option></select></div>
-                    <div><label class="admin-label">Status Bayar</label><select name="status_pembayaran" class="admin-select"><option value="">Semua</option><option value="pending" @selected(($filters['status_pembayaran'] ?? '') === 'pending')>Pending</option><option value="lunas" @selected(($filters['status_pembayaran'] ?? '') === 'lunas')>Lunas</option></select></div>
-                    <div><label class="admin-label">Tanggal Dari</label><input type="date" name="tanggal_dari" value="{{ $filters['tanggal_dari'] ?? '' }}" class="admin-input"></div>
-                    <div><label class="admin-label">Tanggal Sampai</label><input type="date" name="tanggal_sampai" value="{{ $filters['tanggal_sampai'] ?? '' }}" class="admin-input"></div>
-                    <div class="flex items-end gap-2">
-                        <button type="submit" class="admin-btn-primary">Terapkan Filter</button>
-                        <a href="{{ route('admin.dashboard') }}" class="admin-btn-secondary">Reset</a>
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h3 class="font-semibold text-slate-900">Diagram Metode Pembayaran</h3>
+                </div>
+                <div class="admin-card-body flex flex-col items-center gap-5 pt-0 sm:flex-row sm:items-start sm:justify-between">
+                    <div class="rounded-full border border-slate-100 shadow-inner"
+                        style="width:11rem; height:11rem; min-width:11rem; min-height:11rem; background: conic-gradient(#2563eb 0deg {{ $transferDeg }}deg, #8b5cf6 {{ $transferDeg }}deg 360deg);"></div>
+                    <div class="w-full space-y-2 sm:max-w-[220px]">
+                        <div class="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm">
+                            <span class="inline-flex items-center gap-2 text-slate-700"><span class="h-2.5 w-2.5 rounded-full bg-blue-600"></span>Transfer</span>
+                            <span class="font-semibold text-slate-900">{{ $stats['transfer'] }}</span>
+                        </div>
+                        <div class="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm">
+                            <span class="inline-flex items-center gap-2 text-slate-700"><span class="h-2.5 w-2.5 rounded-full bg-violet-500"></span>Bayar di Tempat</span>
+                            <span class="font-semibold text-slate-900">{{ $stats['bayar_ditempat'] }}</span>
+                        </div>
+                        <div class="pt-1 text-xs text-slate-500">Total: {{ $stats['transfer'] + $stats['bayar_ditempat'] }} pembayaran</div>
                     </div>
-                </form>
+                </div>
             </div>
-        </div>
-
-        <div class="admin-card admin-card-grow mt-4">
-            <div class="admin-card-header">
-                <h3 class="font-semibold text-slate-900">Data Pendidik Terbaru</h3>
-                <a href="{{ route('admin.santris.index') }}" class="text-sm font-medium text-emerald-600 hover:text-emerald-700">Lihat semua →</a>
-            </div>
-            <div class="admin-table-wrap">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>No. Daftar</th>
-                            <th>Nama</th>
-                            <th>Lembaga</th>
-                            <th>Metode</th>
-                            <th>Status</th>
-                            <th>Tanggal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($santris as $santri)
-                            <tr>
-                                <td><a href="{{ route('admin.santris.index', ['detail' => $santri->id]) }}" class="font-mono text-xs font-semibold text-emerald-600 hover:text-emerald-700">{{ $santri->nomor_pendaftaran }}</a></td>
-                                <td class="font-medium text-slate-900">{{ $santri->nama_lengkap }}</td>
-                                <td>{{ $santri->lembaga }}</td>
-                                <td>{{ $santri->metode_pembayaran_label }}</td>
-                                <td><x-admin.badge :status="$santri->status_pembayaran" /></td>
-                                <td class="text-slate-500">{{ $santri->created_at->format('d/m/Y') }}</td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="6" class="py-12 text-center text-slate-400">Belum ada data santri</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            @if ($santris->hasPages())
-                <div class="border-t border-slate-100 px-5 py-4">{{ $santris->links() }}</div>
-            @endif
         </div>
     </div>
 </div>

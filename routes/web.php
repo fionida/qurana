@@ -32,6 +32,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/santris', [SantriController::class, 'index'])->name('santris.index');
     Route::get('/santris/{santri}', [SantriController::class, 'show'])->name('santris.show');
+    Route::post('/santris/{santri}/pas-foto', [SantriController::class, 'updatePhoto'])->name('santris.update-photo');
     Route::delete('/santris/{santri}', [SantriController::class, 'destroy'])->name('santris.destroy');
     Route::get('/pembayaran', [PaymentController::class, 'index'])->name('payments.index');
     Route::get('/pembayaran/{santri}', [PaymentController::class, 'show'])->name('payments.show');

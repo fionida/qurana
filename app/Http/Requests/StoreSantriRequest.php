@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Santri;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -33,7 +34,7 @@ class StoreSantriRequest extends FormRequest
             'email' => ['nullable', 'email', 'max:255'],
             'pas_foto' => ['required', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
             'metode_pembayaran' => ['required', Rule::in(['transfer', 'bayar_ditempat'])],
-            'bukti_transfer' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:5120'],
+            'bukti_transfer' => ['required_if:metode_pembayaran,transfer', 'image', 'mimes:jpeg,jpg,png', 'max:5120'],
         ];
     }
 
@@ -59,6 +60,7 @@ class StoreSantriRequest extends FormRequest
             'pas_foto.image' => 'Pas foto harus berupa gambar.',
             'pas_foto.max' => 'Pas foto maksimal 2 MB.',
             'metode_pembayaran.required' => 'Metode pembayaran wajib dipilih.',
+            'bukti_transfer.required_if' => 'Bukti transfer wajib diunggah untuk metode pembayaran transfer.',
             'bukti_transfer.image' => 'Bukti transfer harus berupa gambar.',
             'bukti_transfer.max' => 'Bukti transfer maksimal 5 MB.',
         ];
@@ -81,5 +83,24 @@ class StoreSantriRequest extends FormRequest
         if ($merge !== []) {
             $this->merge($merge);
         }
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            if ($validator->errors()->isNotEmpty()) {
+                return;
+            }
+
+            $exists = Santri::query()
+                ->where('nama_lengkap', $this->input('nama_lengkap'))
+                ->where('tempat_lahir', $this->input('tempat_lahir'))
+                ->whereDate('tanggal_lahir', $this->input('tanggal_lahir'))
+                ->exists();
+
+            if ($exists) {
+                $validator->errors()->add('nama_lengkap', 'Data pendaftar dengan identitas yang sama sudah terdaftar. Pendaftaran hanya dapat dilakukan satu kali.');
+            }
+        });
     }
 }

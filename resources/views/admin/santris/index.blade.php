@@ -6,7 +6,25 @@
 <div class="admin-page" x-data="{
     detailOpen: {{ $detailPayload ? 'true' : 'false' }},
     detail: @js($detailPayload),
-    openDetail(data) { this.detail = data; this.detailOpen = true; }
+    photoEditOpen: false,
+    photoEditAction: '',
+    photoEditName: '',
+    photoEditPreview: '',
+    openDetail(data) { this.detail = data; this.detailOpen = true; },
+    openPhotoEdit(action, name, currentUrl) {
+        this.photoEditAction = action;
+        this.photoEditName = name;
+        this.photoEditPreview = currentUrl;
+        this.photoEditOpen = true;
+        this.$nextTick(() => {
+            if (this.$refs.photoEditInput) this.$refs.photoEditInput.value = '';
+        });
+    },
+    onPhotoPicked(event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        this.photoEditPreview = URL.createObjectURL(file);
+    }
 }">
     <x-admin.page-header title="Database Pendidik" description="Daftar lengkap pendidik yang sudah mendaftar">
         <x-slot:actions>
@@ -32,6 +50,9 @@
                     </select>
                     <button type="submit" class="admin-btn-primary sm:w-auto">Cari</button>
                 </form>
+                @error('pas_foto')
+                    <p class="mt-3 text-sm text-red-600">{{ $message }}</p>
+                @enderror
             </div>
         </div>
     </div>
@@ -80,6 +101,11 @@
                                             <a href="{{ route('admin.payments.kwitansi', $santri) }}" target="_blank" class="text-sm font-medium text-blue-600 hover:text-blue-700">Kwitansi</a>
                                             <a href="{{ route('admin.certificates.print', $santri) }}" target="_blank" class="text-sm font-medium text-violet-600 hover:text-violet-700">Sertifikat</a>
                                         @endif
+                                        <button type="button"
+                                            @click="openPhotoEdit(@js(route('admin.santris.update-photo', $santri)), @js($santri->nama_lengkap), @js($fotoUrl))"
+                                            class="text-sm font-medium text-amber-600 hover:text-amber-700">
+                                            Ganti Foto
+                                        </button>
                                         <form x-ref="deleteForm{{ $santri->id }}" action="{{ route('admin.santris.destroy', $santri) }}" method="POST" class="inline">
                                             @csrf @method('DELETE')
                                             <button type="button"
@@ -107,6 +133,35 @@
         <template x-if="detail">
             <div>@include('admin.santris.partials.detail-modal-body')</div>
         </template>
+    </x-admin.modal>
+
+    <x-admin.modal show="photoEditOpen" title="Ganti Pas Foto">
+        <form x-bind:action="photoEditAction" method="POST" enctype="multipart/form-data" class="space-y-5">
+            @csrf
+            <p class="text-sm text-slate-600">
+                Pendaftar:
+                <span class="font-semibold text-slate-900" x-text="photoEditName"></span>
+            </p>
+
+            <template x-if="photoEditPreview">
+                <div class="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                    <img :src="photoEditPreview" alt="Preview pas foto" class="mx-auto h-44 w-36 rounded-lg object-cover ring-2 ring-slate-200">
+                </div>
+            </template>
+
+            <div>
+                <label class="admin-label">Pilih Foto Baru</label>
+                <input x-ref="photoEditInput" type="file" name="pas_foto" accept="image/jpeg,image/jpg,image/png" required
+                    class="block w-full text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-emerald-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-emerald-700 hover:file:bg-emerald-100"
+                    @change="onPhotoPicked($event)">
+                <p class="mt-1 text-xs text-slate-400">JPG/PNG, maksimal 2 MB.</p>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button type="button" @click="photoEditOpen = false" class="admin-btn-secondary flex-1">Batal</button>
+                <button type="submit" class="admin-btn-primary flex-1">Simpan Foto</button>
+            </div>
+        </form>
     </x-admin.modal>
 </div>
 

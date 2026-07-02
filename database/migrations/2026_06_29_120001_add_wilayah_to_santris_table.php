@@ -9,13 +9,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('santris', function (Blueprint $table) {
-            $table->string('provinsi_id', 2)->nullable()->after('alamat');
+            $table->string('provinsi_id', 10)->nullable()->after('alamat');
             $table->string('provinsi')->nullable()->after('provinsi_id');
-            $table->string('kota_kab_id', 4)->nullable()->after('provinsi');
+            $table->string('kota_kab_id', 10)->nullable()->after('provinsi');
             $table->string('kota_kab')->nullable()->after('kota_kab_id');
-            $table->string('kecamatan_id', 6)->nullable()->after('kota_kab');
+            $table->string('kecamatan_id', 10)->nullable()->after('kota_kab');
             $table->string('kecamatan')->nullable()->after('kecamatan_id');
-            $table->string('desa_id', 10)->nullable()->after('kecamatan');
+            $table->string('desa_id', 15)->nullable()->after('kecamatan');
             $table->string('desa')->nullable()->after('desa_id');
         });
     }

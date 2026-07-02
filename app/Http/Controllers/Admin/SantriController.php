@@ -50,6 +50,27 @@ class SantriController extends Controller
         return redirect()->route('admin.santris.index', ['detail' => $santri->id]);
     }
 
+    public function updatePhoto(Request $request, Santri $santri): RedirectResponse
+    {
+        $request->validate([
+            'pas_foto' => ['required', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
+        ], [
+            'pas_foto.required' => 'Pas foto wajib diunggah.',
+            'pas_foto.image' => 'Pas foto harus berupa gambar.',
+            'pas_foto.max' => 'Pas foto maksimal 2 MB.',
+        ]);
+
+        if ($santri->pas_foto) {
+            Storage::disk('public')->delete($santri->pas_foto);
+        }
+
+        $santri->update([
+            'pas_foto' => $request->file('pas_foto')->store('pas-foto', 'public'),
+        ]);
+
+        return back()->with('success', 'Pas foto pendaftar berhasil diperbarui.');
+    }
+
     public function destroy(Santri $santri): RedirectResponse
     {
         if ($santri->pas_foto) {

@@ -57,7 +57,7 @@ jobs:
             **/vendor.zip
             **/public/build.zip
           timeout: 600000
-          concurrency: 1
+          log-level: standard
 
       - name: Deploy public assets to public_html
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5

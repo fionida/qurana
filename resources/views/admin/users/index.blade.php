@@ -8,6 +8,7 @@
         'id' => old('_user_id', $editUser?->id),
         'name' => old('name', $editUser?->name ?? ''),
         'email' => old('email', $editUser?->email ?? ''),
+        'role' => old('role', $editUser?->role ?? 'admin'),
     ];
 @endphp
 
@@ -48,6 +49,7 @@
                         <tr>
                             <th>Nama</th>
                             <th>Email</th>
+                            <th>Role</th>
                             <th>Terdaftar</th>
                             <th>Aksi</th>
                         </tr>
@@ -64,11 +66,12 @@
                                     </div>
                                 </td>
                                 <td>{{ $user->email }}</td>
+                                <td><span class="text-sm text-slate-600">{{ $user->roleLabel() }}</span></td>
                                 <td class="text-slate-500">{{ $user->created_at->format('d/m/Y') }}</td>
                                 <td>
                                     <div class="flex gap-3">
                                         <button type="button"
-                                            @click="openEdit({ id: {{ $user->id }}, name: @js($user->name), email: @js($user->email) })"
+                                            @click="openEdit({ id: {{ $user->id }}, name: @js($user->name), email: @js($user->email), role: @js($user->role) })"
                                             class="text-sm font-medium text-emerald-600 hover:text-emerald-700">Edit</button>
                                         @if ($user->id !== auth()->id())
                                             <form x-ref="deleteForm{{ $user->id }}" action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline">
@@ -82,7 +85,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="4" class="py-16 text-center text-slate-400">Belum ada user admin</td></tr>
+                            <tr><td colspan="5" class="py-16 text-center text-slate-400">Belum ada user admin</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -106,6 +109,14 @@
                 <label class="admin-label">Email</label>
                 <input type="email" name="email" value="{{ old('_modal') === 'create' ? old('email') : '' }}" required class="admin-input">
                 @if (old('_modal') === 'create') @error('email')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror @endif
+            </div>
+            <div>
+                <label class="admin-label">Role</label>
+                <select name="role" required class="admin-select">
+                    @foreach ($roleOptions as $value => $label)
+                        <option value="{{ $value }}" @selected(old('_modal') === 'create' && old('role', 'admin') === $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
             </div>
             <div>
                 <label class="admin-label">Password</label>
@@ -137,6 +148,14 @@
                 <label class="admin-label">Email</label>
                 <input type="email" name="email" x-model="editForm.email" required class="admin-input">
                 @if (old('_modal') === 'edit') @error('email')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror @endif
+            </div>
+            <div>
+                <label class="admin-label">Role</label>
+                <select name="role" x-model="editForm.role" required class="admin-select">
+                    @foreach ($roleOptions as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
+                </select>
             </div>
             <div>
                 <label class="admin-label">Password Baru</label>

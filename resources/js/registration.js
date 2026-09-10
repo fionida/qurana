@@ -1,8 +1,11 @@
 import flatpickr from 'flatpickr';
 import { Indonesian } from 'flatpickr/dist/l10n/id.js';
 import 'flatpickr/dist/flatpickr.min.css';
+import { syncPaymentVisibility } from './registration-wizard.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    syncPaymentVisibility();
+
     const wrap = document.getElementById('tanggal_lahir_wrap');
     if (wrap) {
         flatpickr(wrap, {
@@ -36,16 +39,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function togglePayment() {
-    const isTransfer = document.querySelector('input[name="metode_pembayaran"][value="transfer"]')?.checked;
-    document.getElementById('bukti-transfer-field')?.classList.toggle('hidden', !isTransfer);
+    syncPaymentVisibility();
 }
 
-document.addEventListener('DOMContentLoaded', togglePayment);
 window.togglePayment = togglePayment;
 
 async function initWilayahCascade() {
     const provinsiSelect = document.getElementById('provinsi_id');
-    if (!provinsiSelect) return;
+    if (!provinsiSelect) {
+        return;
+    }
 
     const regencySelect = document.getElementById('kota_kab_id');
     const districtSelect = document.getElementById('kecamatan_id');
@@ -83,12 +86,17 @@ async function initWilayahCascade() {
 
     const fetchJson = async (url) => {
         const res = await fetch(url);
-        if (!res.ok) return [];
+        if (!res.ok) {
+            return [];
+        }
+
         return res.json();
     };
 
     const syncHiddenName = (select, hiddenInput) => {
-        if (!hiddenInput) return;
+        if (!hiddenInput) {
+            return;
+        }
         const selected = select.options[select.selectedIndex];
         hiddenInput.value = selected && selected.value ? selected.textContent.trim() : '';
     };
@@ -124,7 +132,9 @@ async function initWilayahCascade() {
         districtSelect.disabled = true;
         villageSelect.disabled = true;
 
-        if (!provinsiSelect.value) return;
+        if (!provinsiSelect.value) {
+            return;
+        }
 
         regencySelect.disabled = false;
         const regencies = await fetchJson(`/api/wilayah/regencies/${provinsiSelect.value}`);
@@ -140,7 +150,9 @@ async function initWilayahCascade() {
         districtSelect.disabled = true;
         villageSelect.disabled = true;
 
-        if (!regencySelect.value) return;
+        if (!regencySelect.value) {
+            return;
+        }
 
         districtSelect.disabled = false;
         const districts = await fetchJson(`/api/wilayah/districts/${regencySelect.value}`);
@@ -153,7 +165,9 @@ async function initWilayahCascade() {
         villageName.value = '';
         villageSelect.disabled = true;
 
-        if (!districtSelect.value) return;
+        if (!districtSelect.value) {
+            return;
+        }
 
         villageSelect.disabled = false;
         const villages = await fetchJson(`/api/wilayah/villages/${districtSelect.value}`);
@@ -169,24 +183,32 @@ async function initWilayahCascade() {
 
     if (oldValues.provinsi_id) {
         syncHiddenName(provinsiSelect, provinsiName);
-        if (oldValues.provinsi) provinsiName.value = oldValues.provinsi;
+        if (oldValues.provinsi) {
+            provinsiName.value = oldValues.provinsi;
+        }
         regencySelect.disabled = false;
         const regencies = await fetchJson(`/api/wilayah/regencies/${oldValues.provinsi_id}`);
         fillSelect(regencySelect, regencies, '— Pilih Kota/Kab —', oldValues.kota_kab_id || '');
-        if (oldValues.kota_kab) regencyName.value = oldValues.kota_kab;
+        if (oldValues.kota_kab) {
+            regencyName.value = oldValues.kota_kab;
+        }
     }
 
     if (oldValues.kota_kab_id) {
         districtSelect.disabled = false;
         const districts = await fetchJson(`/api/wilayah/districts/${oldValues.kota_kab_id}`);
         fillSelect(districtSelect, districts, '— Pilih Kecamatan —', oldValues.kecamatan_id || '');
-        if (oldValues.kecamatan) districtName.value = oldValues.kecamatan;
+        if (oldValues.kecamatan) {
+            districtName.value = oldValues.kecamatan;
+        }
     }
 
     if (oldValues.kecamatan_id) {
         villageSelect.disabled = false;
         const villages = await fetchJson(`/api/wilayah/villages/${oldValues.kecamatan_id}`);
         fillSelect(villageSelect, villages, '— Pilih Desa/Kel —', oldValues.desa_id || '');
-        if (oldValues.desa) villageName.value = oldValues.desa;
+        if (oldValues.desa) {
+            villageName.value = oldValues.desa;
+        }
     }
 }

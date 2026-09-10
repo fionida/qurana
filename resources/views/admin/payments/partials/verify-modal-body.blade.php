@@ -2,7 +2,7 @@
     <div class="space-y-4">
         <dl class="space-y-3 text-sm">
             <div class="flex justify-between border-b border-slate-50 pb-2"><dt class="text-slate-500">Nama</dt><dd class="font-medium text-slate-900" x-text="verify.nama_lengkap"></dd></div>
-            <div class="flex justify-between border-b border-slate-50 pb-2"><dt class="text-slate-500">Lembaga</dt><dd class="font-medium text-slate-900" x-text="verify.lembaga"></dd></div>
+            <div class="flex justify-between border-b border-slate-50 pb-2"><dt class="text-slate-500">Asal lembaga</dt><dd class="font-medium text-slate-900" x-text="verify.lembaga"></dd></div>
             <div class="flex justify-between border-b border-slate-50 pb-2"><dt class="text-slate-500">Metode</dt><dd class="font-medium text-slate-900" x-text="verify.metode_pembayaran_label"></dd></div>
             <div class="flex justify-between border-b border-slate-50 pb-2"><dt class="text-slate-500">Status</dt><dd class="font-medium text-slate-900" x-text="verify.status_pembayaran_label"></dd></div>
             <div class="flex justify-between"><dt class="text-slate-500">Biaya</dt><dd class="text-lg font-bold text-emerald-600" x-text="verify.biaya_formatted"></dd></div>

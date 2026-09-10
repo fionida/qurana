@@ -22,7 +22,7 @@
         <dl class="grid grid-cols-1 gap-4 rounded-xl border border-slate-100 bg-slate-50/50 p-5 text-sm sm:grid-cols-2">
             <div><dt class="text-slate-400">Nama</dt><dd class="mt-0.5 font-semibold text-slate-900">{{ $santri->nama_lengkap }}</dd></div>
             <div><dt class="text-slate-400">TTL</dt><dd class="mt-0.5 font-semibold text-slate-900">{{ $santri->ttl }}</dd></div>
-            <div><dt class="text-slate-400">Lembaga</dt><dd class="mt-0.5 font-semibold text-slate-900">{{ $santri->lembaga }}</dd></div>
+            <div><dt class="text-slate-400">Asal lembaga</dt><dd class="mt-0.5 font-semibold text-slate-900">{{ $santri->lembaga }}</dd></div>
             <div class="sm:col-span-2"><dt class="text-slate-400">Alamat</dt><dd class="mt-0.5 font-semibold text-slate-900">{{ $santri->alamat_lengkap }}</dd></div>
             <div><dt class="text-slate-400">Metode Bayar</dt><dd class="mt-0.5 font-semibold text-slate-900">{{ $santri->metode_pembayaran_label }}</dd></div>
         </dl>
@@ -30,7 +30,7 @@
         @if ($santri->metode_pembayaran === 'transfer')
             <div class="rounded-xl border border-amber-200 bg-amber-50 p-5">
                 <h3 class="font-semibold text-slate-900">Instruksi Transfer</h3>
-                <p class="mt-2 text-sm text-slate-600">Transfer sebesar <strong>Rp {{ number_format($biaya, 0, ',', '.') }}</strong> ke:</p>
+                <p class="mt-2 text-sm text-slate-600">Transfer sebesar <strong>Rp {{ number_format($biaya, 0, ',', '.') }}</strong>@if(isset($nominalDasar) && $nominalDasar > $biaya) <span class="text-emerald-700">(diskon dari Rp {{ number_format($nominalDasar, 0, ',', '.') }})</span>@endif ke:</p>
                 <ul class="mt-3 space-y-1 text-sm text-slate-700">
                     <li>{{ $rekening['bank'] }} — <span class="font-mono font-semibold">{{ $rekening['nomor'] }}</span></li>
                     <li>a/n {{ $rekening['atas_nama'] }}</li>
@@ -57,8 +57,13 @@
             </div>
         @endif
 
-        <div class="text-center pt-2">
-            <a href="{{ route('registration.create') }}" class="text-sm font-medium text-emerald-600 hover:text-emerald-700">← Kembali ke halaman pendaftaran</a>
+        <div class="text-center pt-2 space-y-2">
+            <p>
+                <a href="{{ route('kartu-peserta.show', ['santri' => $santri->id, 'tanggal_lahir' => $santri->tanggal_lahir->format('Y-m-d')]) }}" target="_blank" class="text-sm font-medium text-sky-600 hover:underline">Cetak kartu peserta</a>
+                ·
+                <a href="{{ route('status-check.show') }}" class="text-sm font-medium text-emerald-600 hover:underline">Cek status</a>
+            </p>
+            <a href="{{ route('portal.home') }}" class="text-sm font-medium text-emerald-600 hover:text-emerald-700">← Kembali ke portal kegiatan</a>
         </div>
     </div>
 </div>

@@ -4,16 +4,57 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Santri;
+use App\Support\SantriExcelExport;
+use App\Support\SantriReportScope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SantriController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Santri::query()->latest();
+        $query = $this->filteredQuery($request);
+
+        $detailSantri = null;
+        if ($request->filled('detail')) {
+            $detailSantri = Santri::with('verifier')->find($request->detail);
+        }
+
+        return view('admin.santris.index', [
+            'santris' => $query->paginate(15)->withQueryString(),
+            'lembagaOptions' => Santri::lembagaOptions(),
+            'detailPayload' => $detailSantri ? $this->modalPayload($detailSantri) : null,
+            ...SantriReportScope::filterOptions($request),
+        ]);
+    }
+
+    public function show(Santri $santri): RedirectResponse
+    {
+        return redirect()->route('admin.santris.index', ['detail' => $santri->id]);
+    }
+
+    public function export(Request $request): StreamedResponse
+    {
+        $santris = $this->filteredQuery($request)
+            ->with(['gelombang.program', 'voucher'])
+            ->orderBy('nomor_pendaftaran')
+            ->cursor();
+
+        return SantriExcelExport::download($santris);
+    }
+
+    /**
+     * @return Builder<Santri>
+     */
+    private function filteredQuery(Request $request): Builder
+    {
+        $query = Santri::query()->with('gelombang.program')->latest();
+
+        SantriReportScope::apply($query, $request);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -33,21 +74,7 @@ class SantriController extends Controller
             $query->where('status_pembayaran', $request->status_pembayaran);
         }
 
-        $detailSantri = null;
-        if ($request->filled('detail')) {
-            $detailSantri = Santri::with('verifier')->find($request->detail);
-        }
-
-        return view('admin.santris.index', [
-            'santris' => $query->paginate(15)->withQueryString(),
-            'lembagaOptions' => Santri::lembagaOptions(),
-            'detailPayload' => $detailSantri ? $this->modalPayload($detailSantri) : null,
-        ]);
-    }
-
-    public function show(Santri $santri): RedirectResponse
-    {
-        return redirect()->route('admin.santris.index', ['detail' => $santri->id]);
+        return $query;
     }
 
     public function updatePhoto(Request $request, Santri $santri): RedirectResponse
@@ -98,14 +125,12 @@ class SantriController extends Controller
             'email' => $santri->email,
             'alamat' => $santri->alamat,
             'alamat_lengkap' => $santri->alamat_lengkap,
-            'wilayah_lengkap' => $santri->wilayah_lengkap,
-            'provinsi' => $santri->provinsi,
-            'kota_kab' => $santri->kota_kab,
-            'kecamatan' => $santri->kecamatan,
-            'desa' => $santri->desa,
             'metode_pembayaran_label' => $santri->metode_pembayaran_label,
             'status_pembayaran_label' => $santri->status_pembayaran_label,
+            'status_pendaftar_label' => $santri->statusPendaftarLabel(),
+            'nilai_akhir' => $santri->nilai_akhir,
             'is_lunas' => $santri->isLunas(),
+            'kartu_url' => route('admin.santris.kartu-peserta', $santri),
             'foto_url' => asset('storage/'.$santri->pas_foto),
             'bukti_url' => $santri->bukti_transfer ? asset('storage/'.$santri->bukti_transfer) : null,
             'kwitansi_url' => route('admin.payments.kwitansi', $santri),

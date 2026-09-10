@@ -33,7 +33,7 @@
                 <form method="GET" class="flex flex-col gap-3 sm:flex-row">
                     <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Cari nama, nomor, atau lembaga..." class="admin-input flex-1">
                     <select name="lembaga" class="admin-select sm:w-52">
-                        <option value="">Semua Lembaga</option>
+                        <option value="">Semua asal lembaga</option>
                         @foreach ($lembagaOptions as $lembaga)
                             <option value="{{ $lembaga }}" @selected(($filters['lembaga'] ?? '') === $lembaga)>{{ $lembaga }}</option>
                         @endforeach
@@ -58,7 +58,7 @@
                             <th>Foto</th>
                             <th>No. Daftar</th>
                             <th>Nama</th>
-                            <th>Lembaga</th>
+                            <th>Asal lembaga</th>
                             <th>Status</th>
                         </tr>
                     </thead>

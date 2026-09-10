@@ -35,6 +35,10 @@ class StoreSantriRequest extends FormRequest
             'pas_foto' => ['required', 'image', 'mimes:jpeg,jpg,png', 'max:2048'],
             'metode_pembayaran' => ['required', Rule::in(['transfer', 'bayar_ditempat'])],
             'bukti_transfer' => ['required_if:metode_pembayaran,transfer', 'image', 'mimes:jpeg,jpg,png', 'max:5120'],
+            'kode_voucher' => ['nullable', 'string', 'max:32'],
+            'dokumen_ktp' => ['nullable', 'file', 'mimes:jpeg,jpg,png,pdf', 'max:5120'],
+            'dokumen_surat_rekomendasi' => ['nullable', 'file', 'mimes:jpeg,jpg,png,pdf', 'max:5120'],
+            'pernyataan_benar' => ['accepted'],
         ];
     }
 
@@ -63,6 +67,7 @@ class StoreSantriRequest extends FormRequest
             'bukti_transfer.required_if' => 'Bukti transfer wajib diunggah untuk metode pembayaran transfer.',
             'bukti_transfer.image' => 'Bukti transfer harus berupa gambar.',
             'bukti_transfer.max' => 'Bukti transfer maksimal 5 MB.',
+            'pernyataan_benar.accepted' => 'Anda harus menyetujui pernyataan kebenaran data.',
         ];
     }
 

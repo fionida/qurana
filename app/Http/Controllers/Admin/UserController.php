@@ -34,6 +34,7 @@ class UserController extends Controller
             'editUser' => $editUser,
             'openCreate' => $request->boolean('create') || old('_modal') === 'create',
             'openEdit' => $editUser || old('_modal') === 'edit',
+            'roleOptions' => User::roleOptions(),
         ]);
     }
 
@@ -48,6 +49,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'role' => ['required', Rule::in(array_keys(User::roleOptions()))],
         ], [
             'name.required' => 'Nama wajib diisi.',
             'email.required' => 'Email wajib diisi.',
@@ -61,6 +63,7 @@ class UserController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => $validated['password'],
+            'role' => $validated['role'],
             'email_verified_at' => now(),
         ]);
 
@@ -80,6 +83,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'role' => ['required', Rule::in(array_keys(User::roleOptions()))],
         ], [
             'name.required' => 'Nama wajib diisi.',
             'email.required' => 'Email wajib diisi.',
@@ -91,7 +95,12 @@ class UserController extends Controller
         $data = [
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'role' => $validated['role'],
         ];
+
+        if ($user->id === auth()->id() && $validated['role'] !== 'admin') {
+            return back()->with('error', 'Anda tidak dapat mengubah role akun yang sedang login menjadi non-admin.');
+        }
 
         if (! empty($validated['password'])) {
             $data['password'] = Hash::make($validated['password']);

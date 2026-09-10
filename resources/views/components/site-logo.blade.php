@@ -19,7 +19,7 @@
         <div>
             <p class="{{ $s['text'] }} font-bold text-slate-900 leading-tight">Qurana</p>
             @if ($size !== 'sm')
-                <p class="text-xs text-slate-500">Pendaftaran Santri</p>
+                <p class="text-xs text-slate-500">{{ $subtitle ?? 'Portal Pendaftaran' }}</p>
             @endif
         </div>
     @endif

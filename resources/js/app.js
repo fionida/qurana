@@ -1,5 +1,8 @@
 
 import Alpine from 'alpinejs';
+import './admin-gelombang.js';
+import './admin-sertifikat-layout.js';
+import './registration-wizard.js';
 
 Alpine.data('adminShell', () => ({
     sidebarOpen: false,

@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Database Pendidik')
+@section('title', 'Database Peserta')
 
 @section('content')
 <div class="admin-page" x-data="{
@@ -26,8 +26,12 @@
         this.photoEditPreview = URL.createObjectURL(file);
     }
 }">
-    <x-admin.page-header title="Database Pendidik" description="Daftar lengkap pendidik yang sudah mendaftar">
+    <x-admin.page-header title="Database Peserta" description="Daftar lengkap pendidik yang sudah mendaftar">
         <x-slot:actions>
+            <a href="{{ route('admin.santris.export', request()->only(['search', 'program', 'gelombang', 'lembaga', 'status_pembayaran'])) }}"
+                class="admin-btn-secondary">
+                Ekspor Excel
+            </a>
             <a href="{{ route('admin.payments.index') }}" class="admin-btn-secondary">Verifikasi Bayar</a>
         </x-slot:actions>
     </x-admin.page-header>
@@ -35,20 +39,56 @@
     <div class="admin-page-toolbar">
         <div class="admin-card">
             <div class="admin-card-body !py-4">
-                <form method="GET" class="flex flex-col gap-3 sm:flex-row">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, nomor, WA, email..." class="admin-input flex-1">
-                    <select name="lembaga" class="admin-select sm:w-48">
-                        <option value="">Semua Lembaga</option>
-                        @foreach ($lembagaOptions as $lembaga)
-                            <option value="{{ $lembaga }}" @selected(request('lembaga') === $lembaga)>{{ $lembaga }}</option>
-                        @endforeach
-                    </select>
-                    <select name="status_pembayaran" class="admin-select sm:w-40">
-                        <option value="">Semua Status</option>
-                        <option value="pending" @selected(request('status_pembayaran') === 'pending')>Pending</option>
-                        <option value="lunas" @selected(request('status_pembayaran') === 'lunas')>Lunas</option>
-                    </select>
-                    <button type="submit" class="admin-btn-primary sm:w-auto">Cari</button>
+                <form method="GET">
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 xl:items-end">
+                        <div class="min-w-0">
+                            <label for="santris-search" class="admin-label !mb-1 !normal-case !tracking-normal">Cari</label>
+                            <input id="santris-search" type="text" name="search" value="{{ request('search') }}" placeholder="Nama, no. daftar…" class="admin-input w-full !py-2 text-sm">
+                        </div>
+                        <div class="min-w-0">
+                            <label for="santris-program" class="admin-label !mb-1 !normal-case !tracking-normal">Program</label>
+                            <select id="santris-program" name="program" class="admin-select w-full !py-2 text-sm">
+                                <option value="">Semua program</option>
+                                @foreach ($programOptions as $program)
+                                    <option value="{{ $program->id }}" @selected(($selectedProgram?->id ?? null) === $program->id)>{{ $program->nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="min-w-0">
+                            <label for="santris-gelombang" class="admin-label !mb-1 !normal-case !tracking-normal">Gelombang</label>
+                            <select id="santris-gelombang" name="gelombang" class="admin-select w-full !py-2 text-sm">
+                                <option value="">{{ ($selectedProgram ?? null) ? 'Semua gelombang program' : 'Semua gelombang' }}</option>
+                                @foreach ($gelombangOptions as $g)
+                                    <option value="{{ $g->id }}" @selected(($selectedGelombang?->id ?? null) === $g->id)>
+                                        {{ $g->nama }}@if (! $selectedProgram && $g->program) ({{ $g->program->nama }})@endif
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="min-w-0">
+                            <label for="santris-lembaga" class="admin-label !mb-1 !normal-case !tracking-normal">Asal lembaga</label>
+                            <select id="santris-lembaga" name="lembaga" class="admin-select w-full !py-2 text-sm">
+                                <option value="">Semua asal lembaga</option>
+                                @foreach ($lembagaOptions as $lembaga)
+                                    <option value="{{ $lembaga }}" @selected(request('lembaga') === $lembaga)>{{ $lembaga }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="min-w-0">
+                            <label for="santris-status" class="admin-label !mb-1 !normal-case !tracking-normal">Status bayar</label>
+                            <select id="santris-status" name="status_pembayaran" class="admin-select w-full !py-2 text-sm">
+                                <option value="">Semua status</option>
+                                <option value="pending" @selected(request('status_pembayaran') === 'pending')>Pending</option>
+                                <option value="lunas" @selected(request('status_pembayaran') === 'lunas')>Lunas</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end sm:col-span-2 lg:col-span-3 xl:col-span-1">
+                            @if (request()->filled('detail'))
+                                <input type="hidden" name="detail" value="{{ request('detail') }}">
+                            @endif
+                            <button type="submit" class="admin-btn-primary w-full !py-2.5 sm:w-auto sm:min-w-[7.5rem]">Cari</button>
+                        </div>
+                    </div>
                 </form>
                 @error('pas_foto')
                     <p class="mt-3 text-sm text-red-600">{{ $message }}</p>
@@ -66,7 +106,8 @@
                             <th>Foto</th>
                             <th>No. Daftar</th>
                             <th>Nama Lengkap</th>
-                            <th>Lembaga</th>
+                            <th>Program</th>
+                            <th>Asal lembaga</th>
                             <th>JK</th>
                             <th>Kontak</th>
                             <th>Status</th>
@@ -85,6 +126,12 @@
                                 </td>
                                 <td><span class="font-mono text-xs text-slate-500">{{ $santri->nomor_pendaftaran }}</span></td>
                                 <td class="font-semibold text-slate-900">{{ $santri->nama_lengkap }}</td>
+                                <td class="text-xs text-slate-600">
+                                    <span class="block font-medium text-slate-800">{{ $santri->gelombang?->program?->nama ?? '—' }}</span>
+                                    @if ($santri->gelombang)
+                                        <span class="text-slate-400">{{ $santri->gelombang->nama }}</span>
+                                    @endif
+                                </td>
                                 <td>{{ $santri->lembaga }}</td>
                                 <td>{{ $santri->jenis_kelamin_label }}</td>
                                 <td class="text-xs">
@@ -118,7 +165,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="8" class="py-16 text-center"><p class="text-slate-400">Belum ada data santri</p></td></tr>
+                            <tr><td colspan="9" class="py-16 text-center"><p class="text-slate-400">Belum ada data santri</p></td></tr>
                         @endforelse
                     </tbody>
                 </table>

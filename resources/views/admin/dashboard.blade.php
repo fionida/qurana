@@ -4,9 +4,26 @@
 
 @section('content')
 <div class="admin-page">
-    <x-admin.page-header title="Dashboard" description="Rekap data pendaftaran santri Qurana" />
+    <x-admin.page-header title="Dashboard" description="Rekap data pendaftaran santri Qurana">
+        <x-slot:actions>
+            <x-admin.program-gelombang-filter
+                :program-options="$programOptions"
+                :gelombang-options="$gelombangOptions"
+                :selected-program="$selectedProgram"
+                :selected-gelombang="$selectedGelombang"
+                submit-label="Filter"
+                class="!items-center"
+            />
+        </x-slot:actions>
+    </x-admin.page-header>
 
     <div class="admin-page-body admin-page-body--scroll">
+        <div class="grid shrink-0 grid-cols-2 gap-4 lg:grid-cols-4 mb-4">
+            <x-admin.stat-card label="Mengikuti tes" :value="$pmbStats['mengikuti_tes']" color="blue" />
+            <x-admin.stat-card label="Lulus" :value="$pmbStats['lulus']" color="emerald" />
+            <x-admin.stat-card label="Tidak lulus" :value="$pmbStats['tidak_lulus']" color="amber" />
+            <x-admin.stat-card label="Sertifikat terbit" :value="$pmbStats['sertifikat']" color="violet" />
+        </div>
         <div class="grid shrink-0 grid-cols-2 gap-4 lg:grid-cols-5">
             <x-admin.stat-card label="Total Pendaftar" :value="$stats['total']" color="slate">
                 <x-slot:icon><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" /></svg></x-slot:icon>
@@ -27,7 +44,7 @@
 
         <div class="admin-card mt-4 shrink-0">
             <div class="admin-card-header">
-                <h3 class="font-semibold text-slate-900">Rekap per Lembaga</h3>
+                <h3 class="font-semibold text-slate-900">Rekap per asal lembaga</h3>
             </div>
             <div class="admin-card-body pt-0">
                 @if ($lembagaStats->isNotEmpty())

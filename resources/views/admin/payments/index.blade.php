@@ -13,18 +13,37 @@
     <div class="admin-page-toolbar">
         <div class="admin-card">
             <div class="admin-card-body !py-4">
-                <form method="GET" class="flex flex-col gap-3 sm:flex-row">
-                    <select name="status_pembayaran" class="admin-select sm:w-44">
-                        <option value="pending" @selected(request('status_pembayaran', 'pending') === 'pending')>Pending</option>
-                        <option value="lunas" @selected(request('status_pembayaran') === 'lunas')>Lunas</option>
-                        <option value="" @selected(request('status_pembayaran') === '')>Semua</option>
-                    </select>
-                    <select name="metode_pembayaran" class="admin-select sm:w-48">
-                        <option value="">Semua Metode</option>
-                        <option value="transfer" @selected(request('metode_pembayaran') === 'transfer')>Transfer</option>
-                        <option value="bayar_ditempat" @selected(request('metode_pembayaran') === 'bayar_ditempat')>Bayar di Tempat</option>
-                    </select>
-                    <button type="submit" class="admin-btn-primary">Filter</button>
+                <form method="GET" class="flex flex-col gap-3">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+                        <div class="sm:w-44">
+                            <label class="admin-label !mb-1 !normal-case !tracking-normal">Status</label>
+                            <select name="status_pembayaran" class="admin-select w-full">
+                                <option value="pending" @selected(request('status_pembayaran', 'pending') === 'pending')>Pending</option>
+                                <option value="lunas" @selected(request('status_pembayaran') === 'lunas')>Lunas</option>
+                                <option value="" @selected(request('status_pembayaran') === '')>Semua</option>
+                            </select>
+                        </div>
+                        <div class="sm:w-48">
+                            <label class="admin-label !mb-1 !normal-case !tracking-normal">Metode</label>
+                            <select name="metode_pembayaran" class="admin-select w-full">
+                                <option value="">Semua Metode</option>
+                                <option value="transfer" @selected(request('metode_pembayaran') === 'transfer')>Transfer</option>
+                                <option value="bayar_ditempat" @selected(request('metode_pembayaran') === 'bayar_ditempat')>Bayar di Tempat</option>
+                            </select>
+                        </div>
+                        <div class="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2 lg:max-w-xl">
+                            @include('admin.partials.program-gelombang-fields', [
+                                'programOptions' => $programOptions,
+                                'gelombangOptions' => $gelombangOptions,
+                                'selectedProgram' => $selectedProgram,
+                                'selectedGelombang' => $selectedGelombang,
+                            ])
+                        </div>
+                        @if (request()->filled('verify'))
+                            <input type="hidden" name="verify" value="{{ request('verify') }}">
+                        @endif
+                        <button type="submit" class="admin-btn-primary">Filter</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -38,6 +57,7 @@
                         <tr>
                             <th>No. Daftar</th>
                             <th>Nama</th>
+                            <th>Program</th>
                             <th>Metode</th>
                             <th>Bukti</th>
                             <th>Status</th>
@@ -49,6 +69,7 @@
                             <tr>
                                 <td><span class="font-mono text-xs text-slate-500">{{ $santri->nomor_pendaftaran }}</span></td>
                                 <td class="font-medium text-slate-900">{{ $santri->nama_lengkap }}</td>
+                                <td class="text-xs text-slate-600">{{ $santri->gelombang?->program?->nama ?? '—' }}</td>
                                 <td>{{ $santri->metode_pembayaran_label }}</td>
                                 <td>
                                     @if ($santri->bukti_transfer)
@@ -67,7 +88,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="6" class="py-16 text-center text-slate-400">Tidak ada data</td></tr>
+                            <tr><td colspan="7" class="py-16 text-center text-slate-400">Tidak ada data</td></tr>
                         @endforelse
                     </tbody>
                 </table>

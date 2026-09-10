@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Kelola Lembaga')
+@section('title', 'Kelola asal lembaga')
 
 @section('content')
 @php
@@ -20,7 +20,7 @@
         this.editOpen = true;
     }
 }">
-    <x-admin.page-header title="Kelola Lembaga" description="Atur daftar lembaga yang tampil di form pendaftaran">
+    <x-admin.page-header title="Kelola asal lembaga" description="Daftar master nama lembaga asal pendidik — dipakai di form pendaftaran">
         <x-slot:actions>
             <button type="button" @click="createOpen = true" class="admin-btn-primary">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>

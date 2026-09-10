@@ -42,7 +42,9 @@ jobs:
             **/.git*/**
             **/.github/**
             **/node_modules/**
+            **/vendor/**
             **/tests/**
+            **/docs/**
             **/.env
             **/public/**
             **/storage/logs/**
@@ -51,6 +53,11 @@ jobs:
             **/storage/framework/views/**
             **/storage/app/public/**
             **/storage/app/private/**
+            **/storage/backups/**
+            **/vendor.zip
+            **/public/build.zip
+          timeout: 600000
+          concurrency: 1
 
       - name: Deploy public assets to public_html
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5

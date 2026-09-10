@@ -59,16 +59,21 @@ jobs:
           timeout: 600000
           log-level: standard
 
-      - name: Deploy public assets to public_html
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ftp.myqurana.org
-          username: myqz6827
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: 21
-          protocol: ftp
-          local-dir: ./public/
-          server-dir: /public_html/
-          exclude: |
-            **/.DS_Store
-            **/storage/**
+      # JANGAN deploy ke /public_html/ — itu document root https://myqurana.org/
+      # (situs marketing). Deploy public Laravel hanya ke folder subdomain daftar.
+      # Set path yang benar setelah dicek di cPanel → Domains (Document Root
+      # untuk daftar.myqurana.org), contoh: /public_html/daftar/
+      # - name: Deploy public assets to daftar document root
+      #   uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      #   with:
+      #     server: ftp.myqurana.org
+      #     username: myqz6827
+      #     password: ${{ secrets.FTP_PASSWORD }}
+      #     port: 21
+      #     protocol: ftp
+      #     local-dir: ./public/
+      #     server-dir: /public_html/daftar/
+      #     exclude: |
+      #       **/.DS_Store
+      #       **/storage/**
+      #     timeout: 600000

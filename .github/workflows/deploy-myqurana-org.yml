@@ -1,0 +1,30 @@
+name: Deploy myqurana.org (marketing)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy marketing site to public_html
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ftp.myqurana.org
+          username: myqz6827
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          protocol: ftp
+          local-dir: ./deploy/myqurana-org/
+          server-dir: /public_html/
+          dangerous-clean-slate: false
+          state-name: .ftp-deploy-sync-state-myqurana-org.json
+          exclude: |
+            **/.DS_Store
+            **/qurana/**
+            **/daftar/**
+          timeout: 600000
+          log-level: standard

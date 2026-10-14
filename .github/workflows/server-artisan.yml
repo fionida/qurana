@@ -7,124 +7,20 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - name: Create one-shot setup script
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare one-shot setup script
         id: prep
         run: |
           TOKEN=$(openssl rand -hex 32)
           echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
           mkdir -p /tmp/daftar-once
-          cat > /tmp/daftar-once/__once_setup.php <<'PHP'
-          <?php
-          declare(strict_types=1);
-
-          $expected = getenv('ONCE_TOKEN') ?: '___TOKEN___';
-          $given = (string) ($_GET['t'] ?? '');
-          if (!hash_equals($expected, $given)) {
-              http_response_code(404);
-              echo 'Not found';
-              exit;
-          }
-
-          set_time_limit(0);
-          ignore_user_abort(true);
-          header('Content-Type: text/plain; charset=utf-8');
-
-          $root = dirname(__DIR__);
-          chdir($root);
-
-          function out(string $s): void
-          {
-              echo $s."\n";
-              if (function_exists('flush')) {
-                  flush();
-              }
-          }
-
-          function run_shell(string $cmd): int
-          {
-              out('> '.$cmd);
-              $output = [];
-              $code = 1;
-              if (function_exists('exec')) {
-                  exec($cmd.' 2>&1', $output, $code);
-                  foreach ($output as $line) {
-                      out($line);
-                  }
-              } else {
-                  out('exec() disabled; skip shell command');
-              }
-
-              return (int) $code;
-          }
-
-          out('ROOT='.$root);
-          out('PHP='.PHP_VERSION);
-
-          if (!is_dir($root.'/vendor')) {
-              out('vendor missing; trying composer install...');
-          }
-
-          $composerDone = false;
-          foreach ([
-              'composer',
-              '/opt/cpanel/composer/bin/composer',
-              'php '.$root.'/composer.phar',
-          ] as $bin) {
-              if ($bin === 'php '.$root.'/composer.phar' && !is_file($root.'/composer.phar')) {
-                  out('Downloading composer.phar...');
-                  $installer = @file_get_contents('https://getcomposer.org/installer');
-                  if ($installer === false) {
-                      out('Failed to download composer installer');
-                      continue;
-                  }
-                  file_put_contents($root.'/composer-setup.php', $installer);
-                  run_shell('php composer-setup.php --install-dir='.escapeshellarg($root).' --filename=composer.phar');
-                  @unlink($root.'/composer-setup.php');
-              }
-              $code = run_shell($bin.' install --no-dev --optimize-autoloader --no-interaction');
-              if ($code === 0) {
-                  $composerDone = true;
-                  break;
-              }
-          }
-          out($composerDone ? 'composer: OK' : 'composer: skipped/failed (continuing if vendor exists)');
-
-          if (!is_file($root.'/vendor/autoload.php')) {
-              out('FATAL: vendor/autoload.php missing');
-              http_response_code(500);
-              @unlink(__FILE__);
-              exit(1);
-          }
-
-          require $root.'/vendor/autoload.php';
-          /** @var \Illuminate\Foundation\Application $app */
-          $app = require $root.'/bootstrap/app.php';
-          $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-          $kernel->bootstrap();
-
-          foreach ([
-              ['migrate', ['--force' => true]],
-              ['config:clear', []],
-              ['route:clear', []],
-              ['view:clear', []],
-              ['cache:clear', []],
-          ] as [$cmd, $opts]) {
-              out('artisan '.$cmd);
-              $code = $kernel->call($cmd, $opts);
-              out(trim((string) $kernel->output()));
-              out('exit='.$code);
-              if ($cmd === 'migrate' && $code !== 0) {
-                  http_response_code(500);
-                  out('FATAL: migrate failed');
-                  @unlink(__FILE__);
-                  exit(1);
-              }
-          }
-
-          out('DONE_OK');
-          @unlink(__FILE__);
-          PHP
-          sed -i "s/___TOKEN___/${TOKEN}/" /tmp/daftar-once/__once_setup.php
+          sed "s/___TOKEN___/${TOKEN}/" scripts/once-setup.php > /tmp/daftar-once/__once_setup.php
+          # Script lives under public/; root is one level up from public.
+          sed -i 's/dirname(__DIR__)/dirname(__DIR__)/' /tmp/daftar-once/__once_setup.php
+          # Fix root: when placed in public/, dirname(__DIR__) is app root. OK as-is.
+          head -n 5 /tmp/daftar-once/__once_setup.php
 
       - name: Upload one-shot script via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -145,7 +41,13 @@ jobs:
         run: |
           URL="https://daftar.myqurana.org/__once_setup.php?t=${{ steps.prep.outputs.token }}"
           echo "Hitting one-shot setup..."
-          curl -fsS --max-time 900 "$URL" | tee /tmp/once-out.txt
+          set +e
+          code=$(curl -sS -o /tmp/once-out.txt -w "%{http_code}" --max-time 900 "$URL")
+          set -e
+          echo "HTTP $code"
+          echo "----- body -----"
+          cat /tmp/once-out.txt
+          echo "----- end -----"
           grep -q 'DONE_OK' /tmp/once-out.txt
 
       - name: Verify portal
@@ -162,7 +64,6 @@ jobs:
         if: always()
         continue-on-error: true
         run: |
-          # Best-effort delete; script usually self-deletes on success.
           curl -sS --max-time 30 \
             "ftp://myqz6827:${{ secrets.FTP_PASSWORD }}@ftp.myqurana.org/public_html/daftar/public/" \
             -Q "DELE __once_setup.php" -o /dev/null || true

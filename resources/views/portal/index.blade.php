@@ -6,57 +6,6 @@
 
 @section('content')
 <div class="portal-home -mx-0 space-y-8 pb-4 pt-2 sm:space-y-10 sm:pt-0">
-    {{-- Hero --}}
-    <section class="portal-hero overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-700 text-white shadow-xl shadow-emerald-900/15">
-        <div class="grid gap-8 p-6 sm:p-8 lg:grid-cols-2 lg:items-center lg:gap-10 lg:p-10">
-            <div>
-                <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 text-3xl font-extrabold backdrop-blur-sm">Q</div>
-                <h1 class="text-2xl font-extrabold tracking-tight sm:text-3xl lg:text-4xl">Portal Pendaftaran Qurana</h1>
-                <p class="mt-3 max-w-xl text-sm leading-relaxed text-emerald-100 sm:text-base">
-                    Pilih program kegiatan yang sedang dibuka, lalu lanjutkan ke formulir pendaftaran dengan mudah.
-                </p>
-                <ul class="mt-6 grid gap-3 sm:grid-cols-3">
-                    <li class="flex gap-2 rounded-xl bg-white/10 px-3 py-2.5 text-xs sm:text-[11px] lg:text-xs">
-                        <span class="mt-0.5 shrink-0 text-emerald-200">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
-                        </span>
-                        <span><strong class="block font-semibold text-white">Aman & Terpercaya</strong>Data Anda terlindungi</span>
-                    </li>
-                    <li class="flex gap-2 rounded-xl bg-white/10 px-3 py-2.5 text-xs sm:text-[11px] lg:text-xs">
-                        <span class="mt-0.5 shrink-0 text-emerald-200">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-                        </span>
-                        <span><strong class="block font-semibold text-white">Mudah & Cepat</strong>Proses pendaftaran online</span>
-                    </li>
-                    <li class="flex gap-2 rounded-xl bg-white/10 px-3 py-2.5 text-xs sm:text-[11px] lg:text-xs">
-                        <span class="mt-0.5 shrink-0 text-emerald-200">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-                        </span>
-                        <span><strong class="block font-semibold text-white">Transparan</strong>Informasi jelas & akurat</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="relative hidden min-h-[220px] lg:block">
-                <div class="absolute inset-0 rounded-2xl bg-emerald-600/40"></div>
-                <svg class="relative mx-auto h-full w-full max-h-[280px] text-emerald-200/90" viewBox="0 0 400 280" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <ellipse cx="200" cy="250" rx="160" ry="20" fill="currentColor" opacity="0.15"/>
-                    <rect x="120" y="80" width="160" height="140" rx="8" fill="white" opacity="0.95"/>
-                    <rect x="135" y="100" width="30" height="25" rx="2" fill="#059669" opacity="0.7"/>
-                    <rect x="175" y="100" width="30" height="25" rx="2" fill="#059669" opacity="0.5"/>
-                    <rect x="215" y="100" width="30" height="25" rx="2" fill="#059669" opacity="0.7"/>
-                    <rect x="255" y="100" width="15" height="25" rx="2" fill="#059669" opacity="0.4"/>
-                    <rect x="135" y="135" width="30" height="25" rx="2" fill="#059669" opacity="0.5"/>
-                    <rect x="175" y="135" width="30" height="25" rx="2" fill="#059669" opacity="0.7"/>
-                    <rect x="215" y="135" width="30" height="25" rx="2" fill="#059669" opacity="0.5"/>
-                    <rect x="135" y="170" width="30" height="25" rx="2" fill="#059669" opacity="0.6"/>
-                    <rect x="175" y="170" width="70" height="50" rx="2" fill="#047857" opacity="0.8"/>
-                    <polygon points="120,80 200,30 280,80" fill="white" opacity="0.9"/>
-                    <circle cx="320" cy="60" r="28" fill="#fef3c7" opacity="0.35"/>
-                </svg>
-            </div>
-        </div>
-    </section>
-
     {{-- Pengumuman --}}
     @if ($hasOpenRegistration)
         <section class="flex flex-col gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/80 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">

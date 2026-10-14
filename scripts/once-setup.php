@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 $expected = '___TOKEN___';
 $given = (string) ($_GET['t'] ?? '');
-if (!hash_equals($expected, $given)) {
+if (! hash_equals($expected, $given)) {
     http_response_code(404);
     echo 'Not found';
     exit;
@@ -28,58 +28,15 @@ function out(string $s): void
     }
 }
 
-function run_shell(string $cmd): int
-{
-    out('> '.$cmd);
-    $output = [];
-    $code = 1;
-    if (function_exists('exec')) {
-        exec($cmd.' 2>&1', $output, $code);
-        foreach ($output as $line) {
-            out($line);
-        }
-    } else {
-        out('exec() disabled; skip shell command');
-    }
-
-    return (int) $code;
-}
-
 try {
     out('ROOT='.$root);
     out('PHP='.PHP_VERSION);
 
-    if (! is_dir($root.'/vendor')) {
-        out('vendor missing; trying composer install...');
-    }
-
-    $composerDone = false;
-    foreach ([
-        'composer',
-        '/opt/cpanel/composer/bin/composer',
-        'php '.$root.'/composer.phar',
-    ] as $bin) {
-        if ($bin === 'php '.$root.'/composer.phar' && ! is_file($root.'/composer.phar')) {
-            out('Downloading composer.phar...');
-            $installer = @file_get_contents('https://getcomposer.org/installer');
-            if ($installer === false) {
-                out('Failed to download composer installer');
-                continue;
-            }
-            file_put_contents($root.'/composer-setup.php', $installer);
-            run_shell('php composer-setup.php --install-dir='.escapeshellarg($root).' --filename=composer.phar');
-            @unlink($root.'/composer-setup.php');
-        }
-        $code = run_shell($bin.' install --no-dev --optimize-autoloader --no-interaction');
-        if ($code === 0) {
-            $composerDone = true;
-            break;
-        }
-    }
-    out($composerDone ? 'composer: OK' : 'composer: skipped/failed (continuing if vendor exists)');
+    // Shared hosting often disables exec()/escapeshellarg(); run Artisan in-process.
+    out('composer: skipped (no shell); using existing vendor if present');
 
     if (! is_file($root.'/vendor/autoload.php')) {
-        throw new RuntimeException('vendor/autoload.php missing');
+        throw new RuntimeException('vendor/autoload.php missing — upload vendor or enable shell for composer');
     }
 
     require $root.'/vendor/autoload.php';

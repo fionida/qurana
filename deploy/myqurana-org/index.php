@@ -32,7 +32,7 @@
                 <li><a href="#kontak">Kontak</a></li>
             </ul>
             <div class="nav-action">
-                <a href="#program" class="btn btn-cta">Daftar <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="https://daftar.myqurana.org/" class="btn btn-cta" target="_blank" rel="noopener">Daftar <i class="fa-solid fa-arrow-right"></i></a>
                 <!-- Ditambahkan id "menuToggle" -->
                 <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu"><i class="fa-solid fa-bars"></i></button>
             </div>
@@ -439,7 +439,7 @@
         <div class="container">
             <div class="banner-cta-card">
                 <h2>Bergabunglah Bersama Ribuan Pendidik Qur'an Mewujudkan <span class="highlight-orange">Generasi Qur'ani Yang Rabbaniyyin</span></h2>
-                <a href="#" class="btn btn-cta orange-large">Daftar Sekarang <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="https://daftar.myqurana.org/" class="btn btn-cta orange-large" target="_blank" rel="noopener">Daftar Sekarang <i class="fa-solid fa-arrow-right"></i></a>
             </div>
         </div>
     </section>

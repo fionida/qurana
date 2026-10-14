@@ -22,6 +22,6 @@
         </ul>
 
         <!-- Tombol Aksi -->
-        <a href="daftar.php" class="btn btn-primary">Daftar Program</a>
+        <a href="https://daftar.myqurana.org/" class="btn btn-primary" target="_blank" rel="noopener">Daftar Program</a>
     </div>
 </header>

@@ -1,0 +1,38 @@
+name: Server artisan (daftar)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run composer + migrate on hosting
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ftp.myqurana.org
+          username: myqz6827
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 22
+          command_timeout: 30m
+          script: |
+            set -e
+            cd ~/public_html/daftar || cd ~/public_html/daftar
+            pwd
+            php -v
+            if command -v composer >/dev/null 2>&1; then
+              composer install --no-dev --optimize-autoloader --no-interaction
+            elif [ -f /opt/cpanel/composer/bin/composer ]; then
+              /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader --no-interaction
+            else
+              php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+              php composer-setup.php --install-dir=. --filename=composer.phar
+              php composer.phar install --no-dev --optimize-autoloader --no-interaction
+              rm -f composer-setup.php
+            fi
+            php artisan migrate --force
+            php artisan config:clear
+            php artisan route:clear
+            php artisan view:clear
+            php artisan cache:clear
+            echo "DONE_OK"

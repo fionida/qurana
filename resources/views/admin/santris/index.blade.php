@@ -28,10 +28,9 @@
 }">
     <x-admin.page-header title="Database Peserta" description="Daftar lengkap pendidik yang sudah mendaftar">
         <x-slot:actions>
-            <a href="{{ route('admin.santris.export-print', request()->only(['search', 'program', 'gelombang', 'lembaga', 'status_pembayaran'])) }}"
-                target="_blank"
+            <a href="{{ route('admin.santris.export', request()->only(['search', 'program', 'gelombang', 'lembaga', 'status_pembayaran'])) }}"
                 class="admin-btn-secondary">
-                Cetak / Ekspor
+                Ekspor Excel
             </a>
             <a href="{{ route('admin.payments.index') }}" class="admin-btn-secondary">Verifikasi Bayar</a>
         </x-slot:actions>

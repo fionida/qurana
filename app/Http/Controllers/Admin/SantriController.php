@@ -42,9 +42,9 @@ class SantriController extends Controller
         $santris = $this->filteredQuery($request)
             ->with(['gelombang.program', 'voucher'])
             ->orderBy('nomor_pendaftaran')
-            ->cursor();
+            ->get();
 
-        return SantriExcelExport::download($santris);
+        return SantriExcelExport::download($santris, $this->exportFilterSummary($request));
     }
 
     public function exportPrint(Request $request): View
@@ -54,8 +54,20 @@ class SantriController extends Controller
             ->orderBy('nomor_pendaftaran')
             ->get();
 
+        return view('admin.santris.export-print', [
+            'santris' => $santris,
+            'filterSummary' => $this->exportFilterSummary($request),
+        ]);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function exportFilterSummary(Request $request): array
+    {
         $filterSummary = [];
         $options = SantriReportScope::filterOptions($request);
+
         if ($options['selectedProgram']) {
             $filterSummary[] = 'Program: '.$options['selectedProgram']->nama;
         }
@@ -72,10 +84,7 @@ class SantriController extends Controller
             $filterSummary[] = 'Cari: '.$request->string('search');
         }
 
-        return view('admin.santris.export-print', [
-            'santris' => $santris,
-            'filterSummary' => $filterSummary,
-        ]);
+        return $filterSummary;
     }
 
     /**

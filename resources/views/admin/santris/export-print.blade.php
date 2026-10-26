@@ -14,7 +14,7 @@
         </div>
         <div class="toolbar-actions">
             <button type="button" class="primary" onclick="window.print()">Cetak / Simpan PDF</button>
-            <a href="{{ route('admin.santris.export', request()->query()) }}">Unduh CSV</a>
+            <a href="{{ route('admin.santris.export', request()->query()) }}">Unduh Excel</a>
             <a href="{{ route('admin.santris.index', request()->query()) }}">Kembali</a>
         </div>
     </div>

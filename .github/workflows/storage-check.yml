@@ -1,0 +1,52 @@
+name: Storage check (daftar)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: prep
+        run: |
+          TOKEN=$(openssl rand -hex 32)
+          echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
+          echo "token_value=$TOKEN" >> "$GITHUB_OUTPUT"
+          mkdir -p /tmp/daftar-once
+          sed "s/___TOKEN___/${TOKEN}/" scripts/once-storage-check.php > /tmp/daftar-once/__storage_check.php
+
+      - uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ftp.myqurana.org
+          username: myqz6827
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          protocol: ftp
+          local-dir: /tmp/daftar-once/
+          server-dir: /public_html/daftar/public/
+          dangerous-clean-slate: false
+          state-name: .ftp-deploy-sync-state-storage-check.json
+          timeout: 120000
+
+      - name: Hit storage check
+        run: |
+          URL="https://daftar.myqurana.org/__storage_check.php?t=${{ steps.prep.outputs.token }}"
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+          for i in 1 2 3 4 5 6 7 8; do
+            echo "--- attempt $i ---"
+            curl -sS -A "$UA" -o /tmp/check.txt -w "HTTP %{http_code}\n" --max-time 60 "$URL" || true
+            cat /tmp/check.txt || true
+            echo
+            if grep -qE 'DONE_OK|pas_foto_|storage_app' /tmp/check.txt; then
+              SAMPLE=$(grep '^sample_url=' /tmp/check.txt | head -1 | cut -d= -f2-)
+              if [ -n "$SAMPLE" ]; then
+                echo "Probing $SAMPLE"
+                curl -sS -A "$UA" -o /dev/null -w "sample_http=%{http_code} type=%{content_type}\n" --max-time 30 "https://daftar.myqurana.org${SAMPLE}"
+              fi
+              exit 0
+            fi
+            sleep 5
+          done
+          exit 1

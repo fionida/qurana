@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-// Temporary diagnostic — remove after use.
 $expected = 'qurana-storage-check-2026';
 $given = (string) ($_GET['t'] ?? '');
 if (! hash_equals($expected, $given)) {
@@ -16,48 +15,53 @@ header('Content-Type: text/plain; charset=utf-8');
 $root = dirname(__DIR__);
 chdir($root);
 
-$public = $root.'/storage/app/public';
-echo 'storage_app_public='.(is_dir($public) ? 'yes' : 'no')."\n";
-echo 'public_storage='.(file_exists($root.'/public/storage') ? 'yes' : 'no')."\n";
-echo 'public_storage_link='.(is_link($root.'/public/storage') ? 'yes' : 'no')."\n";
+$candidates = [
+    'storage/app/public',
+    'storage/app/private',
+    'storage/app',
+    'public/storage',
+    'storage/app/public/pas-foto',
+    'storage/app/pas-foto',
+    'storage/app/private/pas-foto',
+];
 
-if (is_dir($public)) {
-    $entries = array_values(array_filter(scandir($public) ?: [], fn ($f) => $f !== '.' && $f !== '..'));
-    echo 'public_entries='.implode(',', $entries)."\n";
-}
-
-$pas = $public.'/pas-foto';
-echo 'pas_foto_dir='.(is_dir($pas) ? 'yes' : 'no')."\n";
-
-try {
-    require $root.'/vendor/autoload.php';
-    $app = require $root.'/bootstrap/app.php';
-    $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-    $kernel->bootstrap();
-
-    echo 'db_santris='.Illuminate\Support\Facades\DB::table('santris')->count()."\n";
-    echo 'db_with_pas_foto='.Illuminate\Support\Facades\DB::table('santris')->whereNotNull('pas_foto')->where('pas_foto', '!=', '')->count()."\n";
-
-    $paths = Illuminate\Support\Facades\DB::table('santris')
-        ->whereNotNull('pas_foto')
-        ->where('pas_foto', '!=', '')
-        ->orderByDesc('id')
-        ->limit(5)
-        ->pluck('pas_foto');
-
-    foreach ($paths as $i => $p) {
-        $rel = ltrim(str_replace('\\', '/', (string) $p), '/');
-        $abs = $public.'/'.$rel;
-        echo 'db_path_'.$i.'='.$rel."\n";
-        echo 'db_file_'.$i.'='.(is_file($abs) ? 'yes' : 'MISSING')."\n";
-        if (is_file($abs)) {
-            echo 'sample_url=/storage/'.$rel."\n";
+foreach ($candidates as $rel) {
+    $abs = $root.'/'.$rel;
+    echo $rel.'='.(is_dir($abs) ? 'dir' : (is_file($abs) ? 'file' : 'no'));
+    if (is_dir($abs)) {
+        $files = array_values(array_filter(scandir($abs) ?: [], fn ($f) => $f !== '.' && $f !== '..'));
+        echo ' count='.count($files);
+        if ($files !== []) {
+            echo ' sample='.$files[0];
         }
     }
-
-    echo 'filesystem_disk='.config('filesystems.default')."\n";
-} catch (Throwable $e) {
-    echo 'DB_ERROR='.$e->getMessage()."\n";
+    echo "\n";
 }
+
+// Recursive find any jpg/png under storage/app (max depth)
+$found = [];
+$iterator = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator($root.'/storage/app', FilesystemIterator::SKIP_DOTS),
+    RecursiveIteratorIterator::SELF_FIRST
+);
+foreach ($iterator as $file) {
+    if (! $file->isFile()) {
+        continue;
+    }
+    $ext = strtolower($file->getExtension());
+    if (! in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
+        continue;
+    }
+    $found[] = str_replace('\\', '/', substr($file->getPathname(), strlen($root) + 1));
+    if (count($found) >= 10) {
+        break;
+    }
+}
+echo 'found_images='.count($found)."\n";
+foreach ($found as $i => $p) {
+    echo 'img_'.$i.'='.$p."\n";
+}
+
+echo 'writable_public='.(is_writable($root.'/storage/app/public') ? 'yes' : 'no')."\n";
 
 echo 'DONE_OK'."\n";

@@ -15,6 +15,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->ensurePublicStorageDirectories();
+
         View::composer([
             'layouts.public',
             'auth.login',
@@ -24,5 +26,21 @@ class AppServiceProvider extends ServiceProvider
         ], function ($view) {
             $view->with('siteLogo', Setting::logoUrl());
         });
+    }
+
+    private function ensurePublicStorageDirectories(): void
+    {
+        foreach ([
+            public_path('storage'),
+            public_path('storage/pas-foto'),
+            public_path('storage/bukti-transfer'),
+            public_path('storage/document-templates'),
+            storage_path('app/public'),
+            storage_path('app/public/pas-foto'),
+        ] as $dir) {
+            if (! is_dir($dir)) {
+                @mkdir($dir, 0755, true);
+            }
+        }
     }
 }

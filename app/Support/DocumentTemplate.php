@@ -44,8 +44,8 @@ class DocumentTemplate
         }
 
         foreach ([
-            storage_path('app/public/'.$relative),
             public_path('storage/'.$relative),
+            storage_path('app/public/'.$relative),
         ] as $absolute) {
             if (is_file($absolute)) {
                 return $absolute;

@@ -58,6 +58,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::middleware('role:admin,bendahara,panitia_tes')->group(function () {
         Route::get('/santris', [SantriController::class, 'index'])->name('santris.index');
         Route::get('/santris/export', [SantriController::class, 'export'])->name('santris.export');
+        Route::get('/santris/cetak', [SantriController::class, 'exportPrint'])->name('santris.export-print');
         Route::get('/santris/{santri}', [SantriController::class, 'show'])->name('santris.show');
         Route::get('/santris/{santri}/kartu-peserta', [KartuPesertaController::class, 'adminShow'])->name('santris.kartu-peserta');
     });

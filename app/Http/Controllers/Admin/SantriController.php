@@ -47,6 +47,37 @@ class SantriController extends Controller
         return SantriExcelExport::download($santris);
     }
 
+    public function exportPrint(Request $request): View
+    {
+        $santris = $this->filteredQuery($request)
+            ->with(['gelombang.program'])
+            ->orderBy('nomor_pendaftaran')
+            ->get();
+
+        $filterSummary = [];
+        $options = SantriReportScope::filterOptions($request);
+        if ($options['selectedProgram']) {
+            $filterSummary[] = 'Program: '.$options['selectedProgram']->nama;
+        }
+        if ($options['selectedGelombang']) {
+            $filterSummary[] = 'Gelombang: '.$options['selectedGelombang']->nama;
+        }
+        if ($request->filled('lembaga')) {
+            $filterSummary[] = 'Lembaga: '.$request->string('lembaga');
+        }
+        if ($request->filled('status_pembayaran')) {
+            $filterSummary[] = 'Pembayaran: '.($request->string('status_pembayaran') === 'lunas' ? 'Lunas' : 'Pending');
+        }
+        if ($request->filled('search')) {
+            $filterSummary[] = 'Cari: '.$request->string('search');
+        }
+
+        return view('admin.santris.export-print', [
+            'santris' => $santris,
+            'filterSummary' => $filterSummary,
+        ]);
+    }
+
     /**
      * @return Builder<Santri>
      */

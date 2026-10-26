@@ -9,8 +9,6 @@ final class SantriExcelExport
 {
     /**
      * Stream CSV (UTF-8 BOM) that opens cleanly in Excel.
-     * Avoids PhpSpreadsheet / ext-zip, which often break on shared hosting
-     * when vendor cannot be updated via composer.
      *
      * @param  iterable<int, Santri>  $santris
      */
@@ -19,11 +17,12 @@ final class SantriExcelExport
         $filename = 'peserta-'.now()->format('Ymd-His').'.csv';
 
         $headers = [
+            'No',
             'No. Daftar',
             'Nama Lengkap',
+            'L/P',
             'Tempat Lahir',
             'Tanggal Lahir',
-            'Jenis Kelamin',
             'Program',
             'Gelombang',
             'Asal Lembaga',
@@ -51,8 +50,10 @@ final class SantriExcelExport
             fprintf($out, chr(0xEF).chr(0xBB).chr(0xBF));
             fputcsv($out, $headers);
 
+            $no = 1;
             foreach ($santris as $santri) {
-                fputcsv($out, self::rowValues($santri));
+                fputcsv($out, self::rowValues($santri, $no));
+                $no++;
             }
 
             fclose($out);
@@ -64,14 +65,15 @@ final class SantriExcelExport
     /**
      * @return array<int, string|int|float|null>
      */
-    private static function rowValues(Santri $santri): array
+    private static function rowValues(Santri $santri, int $no): array
     {
         return [
+            $no,
             $santri->nomor_pendaftaran,
             $santri->nama_lengkap,
+            $santri->jenis_kelamin ?: '',
             $santri->tempat_lahir,
-            $santri->tanggal_lahir?->format('Y-m-d') ?? '',
-            $santri->jenis_kelamin_label,
+            $santri->tanggal_lahir?->format('d/m/Y') ?? '',
             $santri->gelombang?->program?->nama ?? '',
             $santri->gelombang?->nama ?? '',
             $santri->lembaga,
@@ -88,10 +90,10 @@ final class SantriExcelExport
             $santri->nilai_akhir ?? '',
             $santri->niq ?? '',
             $santri->nomor_sertifikat ?? '',
-            $santri->isLunas() ? $santri->jumlahBayarEfektif() : '',
+            $santri->isLunas() ? number_format($santri->jumlahBayarEfektif(), 0, ',', '.') : '',
             $santri->voucher?->kode ?? '',
-            $santri->verified_at?->format('Y-m-d H:i') ?? '',
-            $santri->created_at?->format('Y-m-d H:i') ?? '',
+            $santri->verified_at?->format('d/m/Y H:i') ?? '',
+            $santri->created_at?->format('d/m/Y H:i') ?? '',
         ];
     }
 }

@@ -45,6 +45,22 @@ try {
     $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
     $kernel->bootstrap();
 
+    $publicStorage = public_path('storage');
+    $target = storage_path('app/public');
+    if (! is_dir($target)) {
+        @mkdir($target, 0755, true);
+        out('created storage/app/public');
+    }
+    if (! file_exists($publicStorage)) {
+        if (@symlink($target, $publicStorage)) {
+            out('storage:link created');
+        } else {
+            out('storage:link skipped (symlink unavailable; /storage route serves files)');
+        }
+    } else {
+        out('public/storage already exists');
+    }
+
     foreach ([
         ['migrate', ['--force' => true]],
         ['config:clear', []],

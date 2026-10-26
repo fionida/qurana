@@ -23,10 +23,16 @@ use App\Http\Controllers\Admin\VoucherController;
 use App\Http\Controllers\KartuPesertaController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicStorageController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\StatusCheckController;
 use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
+
+// Fallback when public/storage symlink is unavailable on shared hosting.
+Route::get('/storage/{path}', PublicStorageController::class)
+    ->where('path', '.*')
+    ->name('storage.public');
 
 Route::get('/cek-status', [StatusCheckController::class, 'show'])->name('status-check.show');
 Route::post('/cek-status', [StatusCheckController::class, 'lookup'])->name('status-check.lookup');

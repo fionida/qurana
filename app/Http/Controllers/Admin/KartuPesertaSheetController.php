@@ -46,15 +46,17 @@ class KartuPesertaSheetController extends Controller
         abort_if($santris->isEmpty(), 404, 'Data peserta tidak ditemukan.');
 
         $perHalaman = (int) ($validated['per_halaman'] ?? 12);
+        $gridCols = match ($perHalaman) {
+            8 => 2,
+            16 => 4,
+            default => 3,
+        };
 
         return view('admin.kartu-peserta.print', [
             'santris' => $santris,
             'perHalaman' => $perHalaman,
-            'gridCols' => match ($perHalaman) {
-                8 => 2,
-                16 => 4,
-                default => 3,
-            },
+            'gridCols' => $gridCols,
+            'gridRows' => (int) ($perHalaman / $gridCols),
             'backgroundUrl' => DocumentTemplate::isPrintableBackground('kartu_ujian')
                 ? DocumentTemplate::publicUrl('kartu_ujian')
                 : null,

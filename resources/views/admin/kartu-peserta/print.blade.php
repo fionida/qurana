@@ -4,14 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cetak Kartu Peserta Massal</title>
-    @include('print.styles.kartu-peserta-mass', ['gridCols' => $gridCols])
+    @include('print.styles.kartu-peserta-mass', ['gridCols' => $gridCols, 'gridRows' => $gridRows])
 </head>
 <body>
     <div class="toolbar">
         <div>
             Total kartu: <strong>{{ $santris->count() }}</strong>
             · {{ $perHalaman }} kartu / halaman A4
-            · Grid {{ $gridCols }} kolom
+            · Grid {{ $gridCols }}×{{ $gridRows }}
         </div>
         <div class="toolbar-actions">
             <button type="button" class="primary" onclick="window.print()">Cetak Sekarang</button>
@@ -34,9 +34,10 @@
                                 <div class="card-inner">
                                     <div class="body" style="padding:0;">
                                         @if ($fotoUrl)
-                                            <img src="{{ $fotoUrl }}" alt="" class="photo">
+                                            <img src="{{ $fotoUrl }}" alt="" class="photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                            <div class="photo-missing" style="display:none;">Tanpa foto</div>
                                         @else
-                                            <div class="photo photo-missing">Tanpa foto</div>
+                                            <div class="photo-missing">Tanpa foto</div>
                                         @endif
                                         <div class="meta">
                                             <strong>{{ $santri->nama_lengkap }}</strong>
@@ -58,9 +59,10 @@
                                 </div>
                                 <div class="body">
                                     @if ($fotoUrl)
-                                        <img src="{{ $fotoUrl }}" alt="" class="photo">
+                                        <img src="{{ $fotoUrl }}" alt="" class="photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <div class="photo-missing" style="display:none;">Tanpa foto</div>
                                     @else
-                                        <div class="photo photo-missing">Tanpa foto</div>
+                                        <div class="photo-missing">Tanpa foto</div>
                                     @endif
                                     <div class="meta">
                                         <strong>{{ $santri->nama_lengkap }}</strong>

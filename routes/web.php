@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\GelombangController;
 use App\Http\Controllers\Admin\GelombangKomponenTesController;
 use App\Http\Controllers\Admin\GelombangLayoutController;
 use App\Http\Controllers\Admin\GelombangMateriController;
+use App\Http\Controllers\Admin\KartuPesertaSheetController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\LembagaController;
 use App\Http\Controllers\Admin\PaymentController;
@@ -72,6 +73,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::middleware('role:admin')->group(function () {
         Route::post('/santris/{santri}/pas-foto', [SantriController::class, 'updatePhoto'])->name('santris.update-photo');
         Route::delete('/santris/{santri}', [SantriController::class, 'destroy'])->name('santris.destroy');
+        Route::get('/kartu-peserta', [KartuPesertaSheetController::class, 'index'])->name('kartu-peserta.index');
+        Route::get('/kartu-peserta/cetak', [KartuPesertaSheetController::class, 'print'])->name('kartu-peserta.print');
     });
 
     Route::middleware('role:admin,bendahara')->group(function () {

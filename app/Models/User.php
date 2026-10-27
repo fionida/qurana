@@ -65,6 +65,7 @@ class User extends Authenticatable
             'tes' => $this->hasRole('admin', 'panitia_tes'),
             'certificates' => $this->hasRole('admin', 'operator_cetak'),
             'photo_sheets' => $this->hasRole('admin', 'operator_cetak'),
+            'kartu_sheets' => $this->hasRole('admin'),
             'templates' => $this->hasRole('admin', 'operator_cetak'),
             'gelombangs' => $this->hasRole('admin', 'operator_cetak'),
             'settings' => $this->isAdmin(),

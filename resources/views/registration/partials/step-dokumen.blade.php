@@ -4,7 +4,7 @@
     <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div class="reg-upload-card" :class="{ 'reg-upload-card-has-file': files.pas_foto }">
             <p class="text-sm font-semibold text-slate-800">Pas Foto *</p>
-            <p class="mt-1 text-xs text-slate-500">JPG/PNG, maks. 2 MB · 4×6, background merah</p>
+            <p class="mt-1 text-xs text-slate-500">JPG/PNG, maks. 8 MB · 4×6, background merah</p>
             <p class="mt-2 text-xs font-medium text-emerald-700" x-show="files.pas_foto" x-text="files.pas_foto"></p>
             <input type="file" x-ref="filePasFoto" id="pas_foto" name="pas_foto" accept="image/jpeg,image/jpg,image/png" required class="hidden"
                 @change="onFileChange($event, 'pas_foto')">
